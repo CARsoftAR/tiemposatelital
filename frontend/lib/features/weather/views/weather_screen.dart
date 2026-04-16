@@ -14,31 +14,63 @@ class WeatherScreen extends ConsumerWidget {
     return weatherAsync.when(
       data: (weather) {
         if (weather == null) return _buildLoading();
-        
         final code = weather.current.weatherCode;
 
         return DynamicWeatherBackground(
           weatherCode: code,
-          child: SingleChildScrollView(
+          child: CustomScrollView(
             physics: const BouncingScrollPhysics(),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 15),
-                _buildPremiumSearchBar(),
-                const SizedBox(height: 35),
-                _buildMasterHero(weather, code),
-                const SizedBox(height: 50),
-                _buildSectionLabel('D E T A L L E  H O R A R I O'),
-                const SizedBox(height: 15),
-                _buildMasterHourly(weather),
-                const SizedBox(height: 40),
-                _buildSectionLabel('P R Ó X I M O S  D Í A S'),
-                const SizedBox(height: 15),
-                _buildMasterDaily(weather),
-                const SizedBox(height: 40),
-              ],
-            ),
+            slivers: [
+              // Barra de Búsqueda Premium
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 20, left: 24, right: 24),
+                  child: _buildSliverSearchBar(),
+                ),
+              ),
+              
+              // Hero Section: Temperatura y Icono
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 40, bottom: 60),
+                  child: _buildSliverHero(weather, code),
+                ),
+              ),
+
+              // Sección: Detalle Horario
+              SliverToBoxAdapter(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildSectionTitle('DETALLE POR HORA'),
+                    const SizedBox(height: 15),
+                    _buildSliverHourly(weather),
+                    const SizedBox(height: 45),
+                    _buildSectionTitle('PRÓXIMOS DÍAS'),
+                    const SizedBox(height: 15),
+                  ],
+                ),
+              ),
+
+              // Lista: Pronóstico Diario
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final day = weather.daily[index];
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: _buildDailyGlassCard(day),
+                      );
+                    },
+                    childCount: weather.daily.length,
+                  ),
+                ),
+              ),
+
+              const SliverToBoxAdapter(child: SizedBox(height: 40)),
+            ],
           ),
         );
       },
@@ -47,87 +79,76 @@ class WeatherScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildPremiumSearchBar() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: PremiumGlassCard(
-        borderRadius: 30,
-        blur: 40,
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          child: Row(
-            children: [
-              const Icon(Icons.location_on_outlined, color: Colors.white70, size: 20),
-              const SizedBox(width: 15),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'BERAZATEGUI',
-                      style: GoogleFonts.manrope(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
-                        letterSpacing: 2,
-                      ),
-                      overflow: TextOverflow.ellipsis,
+  Widget _buildSliverSearchBar() {
+    return PremiumGlassCard(
+      blur: 30,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        child: Row(
+          children: [
+            const Icon(Icons.location_on_outlined, color: Colors.white60, size: 20),
+            const SizedBox(width: 15),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'BERAZATEGUI',
+                    style: GoogleFonts.manrope(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                      letterSpacing: 2,
                     ),
-                    Text(
-                      'BUENOS AIRES, ARGENTINA',
-                      style: GoogleFonts.manrope(
-                        fontSize: 10,
-                        color: Colors.white.withOpacity(0.4),
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 0.5,
-                      ),
-                      overflow: TextOverflow.ellipsis,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                    'BUENOS AIRES, ARGENTINA',
+                    style: GoogleFonts.manrope(
+                      fontSize: 10,
+                      color: Colors.white.withOpacity(0.4),
+                      fontWeight: FontWeight.w600,
                     ),
-                  ],
-                ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
               ),
-              Icon(Icons.tune_outlined, color: Colors.white.withOpacity(0.7), size: 18),
-            ],
-          ),
+            ),
+            const Icon(Icons.tune_outlined, color: Colors.white60, size: 18),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildMasterHero(weather, int code) {
-    return Center(
-      child: Column(
-        children: [
-          VolumetricIcon(
-            weatherCode: code,
-            size: 130, // Proporción perfecta
+  Widget _buildSliverHero(weather, int code) {
+    return Column(
+      children: [
+        VolumetricIcon(weatherCode: code, size: 150),
+        const SizedBox(height: 10),
+        Text(
+          '${weather.current.temperature.round()}°',
+          style: GoogleFonts.manrope(
+            fontSize: 130,
+            fontWeight: FontWeight.w200,
+            color: Colors.white,
+            height: 1,
           ),
-          const SizedBox(height: 10),
-          Text(
-            '${weather.current.temperature.round()}°',
-            style: GoogleFonts.manrope(
-              fontSize: 130,
-              fontWeight: FontWeight.w200,
-              color: Colors.white,
-              height: 1,
-            ),
+        ),
+        Text(
+          _getLabel(code).toUpperCase(),
+          style: GoogleFonts.manrope(
+            fontSize: 12,
+            letterSpacing: 10,
+            color: Colors.white.withOpacity(0.4),
+            fontWeight: FontWeight.w700,
           ),
-          Text(
-            _getLabel(code).toUpperCase(),
-            style: GoogleFonts.manrope(
-              fontSize: 12,
-              letterSpacing: 10,
-              color: Colors.white.withOpacity(0.5),
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
-  Widget _buildMasterHourly(weather) {
+  Widget _buildSliverHourly(weather) {
     final hourly = weather.hourly.take(6).toList();
     
     return SizedBox(
@@ -145,7 +166,7 @@ class WeatherScreen extends ConsumerWidget {
               borderRadius: 25,
               child: Container(
                 width: 85,
-                padding: const EdgeInsets.symmetric(vertical: 18),
+                padding: const EdgeInsets.symmetric(vertical: 20),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -153,11 +174,11 @@ class WeatherScreen extends ConsumerWidget {
                       '${DateTime.parse(item.time).hour}h',
                       style: GoogleFonts.manrope(
                         color: Colors.white38, 
-                        fontSize: 12,
+                        fontSize: 11,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    VolumetricIcon(weatherCode: item.weatherCode, size: 35),
+                    VolumetricIcon(weatherCode: item.weatherCode, size: 32),
                     Text(
                       '${item.temperature.round()}°',
                       style: GoogleFonts.manrope(
@@ -176,81 +197,67 @@ class WeatherScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildMasterDaily(weather) {
-    return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: weather.daily.length,
-      itemBuilder: (context, index) {
-        final day = weather.daily[index];
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 12),
-          child: PremiumGlassCard(
-            borderRadius: 25,
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
-              child: Row(
+  Widget _buildDailyGlassCard(day) {
+    return PremiumGlassCard(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+        child: Row(
+          children: [
+            VolumetricIcon(weatherCode: day.weatherCode, size: 30),
+            const SizedBox(width: 20),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  VolumetricIcon(weatherCode: day.weatherCode, size: 30),
-                  const SizedBox(width: 20),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          _getDay(day.date).toUpperCase(),
-                          style: GoogleFonts.manrope(
-                            color: Colors.white, 
-                            fontWeight: FontWeight.w700,
-                            fontSize: 13,
-                            letterSpacing: 1.5,
-                          ),
-                        ),
-                        Text(
-                          _getLabel(day.weatherCode),
-                          style: GoogleFonts.manrope(
-                            color: Colors.white.withOpacity(0.3),
-                            fontSize: 11,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
                   Text(
-                    '${day.maxTemp.round()}°',
+                    _getDay(day.date).toUpperCase(),
                     style: GoogleFonts.manrope(
                       color: Colors.white, 
-                      fontWeight: FontWeight.w800,
-                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 13,
+                      letterSpacing: 1.5,
                     ),
                   ),
-                  const SizedBox(width: 12),
                   Text(
-                    '${day.minTemp.round()}°',
+                    _getLabel(day.weatherCode),
                     style: GoogleFonts.manrope(
-                      color: Colors.white.withOpacity(0.1),
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
+                      color: Colors.white.withOpacity(0.3),
+                      fontSize: 11,
                     ),
                   ),
                 ],
               ),
             ),
-          ),
-        );
-      },
+            Text(
+              '${day.maxTemp.round()}°',
+              style: GoogleFonts.manrope(
+                color: Colors.white, 
+                fontWeight: FontWeight.w800,
+                fontSize: 16,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Text(
+              '${day.minTemp.round()}°',
+              style: GoogleFonts.manrope(
+                color: Colors.white.withOpacity(0.15),
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
-  Widget _buildSectionLabel(String label) {
+  Widget _buildSectionTitle(String title) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Text(
-        label,
+        title,
         style: GoogleFonts.manrope(
-          color: Colors.white.withOpacity(0.25),
+          color: Colors.white24,
           fontSize: 11,
           fontWeight: FontWeight.w800,
           letterSpacing: 2,
@@ -275,29 +282,29 @@ class WeatherScreen extends ConsumerWidget {
 
   Widget _buildLoading() {
     return const Scaffold(
-      backgroundColor: Color(0xFF000B18),
-      body: Center(child: CircularProgressIndicator(color: Colors.white24)),
+      backgroundColor: Color(0xFF000814),
+      body: Center(child: CircularProgressIndicator(color: Colors.white10)),
     );
   }
 
   Widget _buildErrorScreen(WidgetRef ref) {
     return Scaffold(
-      backgroundColor: const Color(0xFF000B18),
+      backgroundColor: const Color(0xFF000814),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.cloud_off_rounded, color: Colors.white24, size: 50),
+            const Icon(Icons.cloud_off_outlined, color: Colors.white10, size: 60),
             const SizedBox(height: 20),
             Text(
-              'CONEXIÓN FALLIDA',
-              style: GoogleFonts.manrope(color: Colors.white24, fontWeight: FontWeight.w800),
+              'ERROR DE SISTEMA',
+              style: GoogleFonts.manrope(color: Colors.white10, fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.white10),
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.white.withOpacity(0.05)),
               onPressed: () => ref.refresh(weatherProvider),
-              child: const Text('REINTENTAR', style: TextStyle(color: Colors.white60)),
+              child: Text('REINTENTAR', style: TextStyle(color: Colors.white.withOpacity(0.38))),
             ),
           ],
         ),

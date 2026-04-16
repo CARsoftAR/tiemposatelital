@@ -5,6 +5,7 @@ import 'package:lottie/lottie.dart';
 
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class DynamicWeatherBackground extends StatelessWidget {
   final int? weatherCode;
@@ -21,14 +22,14 @@ class DynamicWeatherBackground extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
-          // Capas Topográficas de Fondo (Estilo Papel Azul)
+          // Fondo Profundo (Identidad Flowy)
           Positioned.fill(
             child: Container(
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [Color(0xFF001F3F), Color(0xFF003366)], // Azul Profundo
+                  colors: [Color(0xFF001529), Color(0xFF003366)], 
                 ),
               ),
             ),
@@ -38,7 +39,7 @@ class DynamicWeatherBackground extends StatelessWidget {
               painter: TopographicPainter(),
             ),
           ),
-          // Contenido Principal
+          // Contenido principal con Glassmorphism
           SafeArea(child: child),
         ],
       ),
@@ -51,37 +52,33 @@ class TopographicPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final paint = Paint()..style = PaintingStyle.fill;
 
-    // Capa 1 (Más profunda)
+    // Capas Orgánicas con Sombras Profundas
+    paint.color = const Color(0xFF002D5A).withOpacity(0.6);
+    _drawLayer(canvas, size, 0.35, 0.55, paint);
+
     paint.color = const Color(0xFF004080).withOpacity(0.5);
-    _drawLayer(canvas, size, 0.4, 0.6, paint, shadow: true);
+    _drawLayer(canvas, size, 0.45, 0.65, paint);
 
-    // Capa 2
     paint.color = const Color(0xFF0059B3).withOpacity(0.4);
-    _drawLayer(canvas, size, 0.5, 0.7, paint, shadow: true);
-
-    // Capa 3
-    paint.color = const Color(0xFF0073E6).withOpacity(0.3);
-    _drawLayer(canvas, size, 0.6, 0.8, paint, shadow: true);
+    _drawLayer(canvas, size, 0.55, 0.75, paint);
   }
 
-  void _drawLayer(Canvas canvas, Size size, double y1, double y2, Paint paint, {bool shadow = false}) {
+  void _drawLayer(Canvas canvas, Size size, double y1, double y2, Paint paint) {
     final path = Path();
     path.moveTo(0, size.height * y1);
     path.quadraticBezierTo(
-      size.width * 0.4, size.height * (y1 - 0.1),
-      size.width * 0.7, size.height * y2,
+      size.width * 0.45, size.height * (y1 - 0.12),
+      size.width * 0.75, size.height * y2,
     );
     path.quadraticBezierTo(
-      size.width * 0.9, size.height * (y2 + 0.1),
-      size.width, size.height * (y1 + 0.05),
+      size.width * 0.95, size.height * (y2 + 0.08),
+      size.width, size.height * (y1 + 0.02),
     );
     path.lineTo(size.width, size.height);
     path.lineTo(0, size.height);
     path.close();
 
-    if (shadow) {
-      canvas.drawShadow(path, Colors.black, 15, true);
-    }
+    canvas.drawShadow(path, Colors.black.withOpacity(0.8), 20, true);
     canvas.drawPath(path, paint);
   }
 
@@ -92,11 +89,13 @@ class TopographicPainter extends CustomPainter {
 class GlassCard extends StatelessWidget {
   final Widget child;
   final double borderRadius;
+  final double blur;
 
   const GlassCard({
     super.key,
     required this.child,
-    this.borderRadius = 22.0,
+    this.borderRadius = 24.0,
+    this.blur = 20.0,
   });
 
   @override
@@ -104,13 +103,13 @@ class GlassCard extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(borderRadius),
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
+        filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.08),
+            color: Colors.white.withOpacity(0.06),
             borderRadius: BorderRadius.circular(borderRadius),
             border: Border.all(
-              color: Colors.white.withOpacity(0.12),
+              color: Colors.white.withOpacity(0.1), // Hilo blanco casi invisible
               width: 0.5,
             ),
           ),

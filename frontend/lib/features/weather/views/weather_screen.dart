@@ -28,12 +28,12 @@ class WeatherScreen extends ConsumerWidget {
                 _buildPaperSearchBar(),
                 const SizedBox(height: 40),
                 _buildHeroRelief(weather, code),
-                const SizedBox(height: 60),
-                _buildSectionLabel('D E T A L L E  P O R  H O R A'),
+                const SizedBox(height: 50),
+                _buildSectionLabel('DETALLE POR HORA'),
                 const SizedBox(height: 20),
                 _buildHourlyRelief(weather),
-                const SizedBox(height: 40),
-                _buildSectionLabel('P R Ó X I M O S  D Í A S'),
+                const SizedBox(height: 40), // Espacio preventivo entre secciones
+                _buildSectionLabel('PRÓXIMOS DÍAS'),
                 const SizedBox(height: 20),
                 _buildDailyRelief(weather),
                 const SizedBox(height: 40),
@@ -100,13 +100,13 @@ class WeatherScreen extends ConsumerWidget {
         children: [
           VolumetricIcon(
             weatherCode: code,
-            size: 200,
+            size: 160, // Ajustado para evitar empujar contenido
           ),
           const SizedBox(height: 10),
           Text(
             '${weather.current.temperature.round()}°',
             style: GoogleFonts.manrope(
-              fontSize: 150,
+              fontSize: 120, // Ajustado ligeramente para balance
               fontWeight: FontWeight.w200,
               color: Colors.white,
               height: 1,
@@ -130,7 +130,7 @@ class WeatherScreen extends ConsumerWidget {
     final hourly = weather.hourly.take(6).toList();
     
     return SizedBox(
-      height: 160,
+      height: 155, // Altura balanceada
       child: ListView.builder(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         scrollDirection: Axis.horizontal,
@@ -144,10 +144,10 @@ class WeatherScreen extends ConsumerWidget {
               borderRadius: 24,
               color: const Color(0xFF003D7A),
               child: Container(
-                width: 95,
-                padding: const EdgeInsets.symmetric(vertical: 20),
+                width: 90,
+                padding: const EdgeInsets.symmetric(vertical: 16),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween, // Distribución controlada
                   children: [
                     Text(
                       '${DateTime.parse(item.time).hour}h',
@@ -157,15 +157,13 @@ class WeatherScreen extends ConsumerWidget {
                         fontWeight: FontWeight.w800,
                       ),
                     ),
-                    const SizedBox(height: 15),
-                    VolumetricIcon(weatherCode: item.weatherCode, size: 45),
-                    const SizedBox(height: 15),
+                    VolumetricIcon(weatherCode: item.weatherCode, size: 38), // Reducido para evitar overflow
                     Text(
                       '${item.temperature.round()}°',
                       style: GoogleFonts.manrope(
                         color: Colors.white, 
                         fontWeight: FontWeight.w900,
-                        fontSize: 20,
+                        fontSize: 19,
                       ),
                     ),
                   ],
@@ -192,10 +190,10 @@ class WeatherScreen extends ConsumerWidget {
             borderRadius: 24,
             color: const Color(0xFF002D5A),
             child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 22, horizontal: 24),
+              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
               child: Row(
                 children: [
-                  VolumetricIcon(weatherCode: day.weatherCode, size: 40),
+                  VolumetricIcon(weatherCode: day.weatherCode, size: 38),
                   const SizedBox(width: 20),
                   Expanded(
                     child: Column(
@@ -206,7 +204,7 @@ class WeatherScreen extends ConsumerWidget {
                           style: GoogleFonts.manrope(
                             color: Colors.white, 
                             fontWeight: FontWeight.w900,
-                            fontSize: 15,
+                            fontSize: 14,
                             letterSpacing: 2,
                           ),
                         ),
@@ -214,7 +212,7 @@ class WeatherScreen extends ConsumerWidget {
                           _getLabel(day.weatherCode),
                           style: GoogleFonts.manrope(
                             color: Colors.white.withOpacity(0.5),
-                            fontSize: 12,
+                            fontSize: 11,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
@@ -255,7 +253,7 @@ class WeatherScreen extends ConsumerWidget {
         style: GoogleFonts.manrope(
           color: Colors.white.withOpacity(0.4),
           fontSize: 13,
-          fontWeight: FontWeight.w900,
+          fontWeight: FontWeight.w600, // Ajustado a pedido
           letterSpacing: 3,
         ),
       ),
@@ -292,15 +290,14 @@ class WeatherScreen extends ConsumerWidget {
           children: [
             const Icon(Icons.warning_amber_rounded, color: Colors.white, size: 50),
             const SizedBox(height: 20),
-            Text(
+            const Text(
               'ERROR DE SISTEMA',
-              style: GoogleFonts.manrope(color: Colors.white, fontWeight: FontWeight.w900),
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.white24),
               onPressed: () => ref.refresh(weatherProvider),
-              child: const Text('REINTENTAR', style: TextStyle(color: Colors.white)),
+              child: const Text('REINTENTAR'),
             ),
           ],
         ),

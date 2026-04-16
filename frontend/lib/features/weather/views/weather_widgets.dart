@@ -21,16 +21,16 @@ class DynamicWeatherBackground extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF000814), // Fondo base ultra profundo
+      backgroundColor: const Color(0xFF00050A), // Negro profundidad
       body: Stack(
         children: [
-          // Capas de Papel con Profundidad Real (5 capas de Path)
+          // Capas de Papel Erratas y Orgánicas (Profundidad Real)
           Positioned.fill(
             child: CustomPaint(
-              painter: MasterSliverPainter(),
+              painter: PaperCutArtPainter(),
             ),
           ),
-          // Contenido principal (Slivers se manejarán en la pantalla)
+          // El contenido debe ser un Sliver para el scroll fluido
           child,
         ],
       ),
@@ -38,58 +38,68 @@ class DynamicWeatherBackground extends StatelessWidget {
   }
 }
 
-class MasterSliverPainter extends CustomPainter {
+class PaperCutArtPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()..style = PaintingStyle.fill;
 
-    // Capas Orgánicas Únicas con Sombras de 25.0
-    _drawPathLayer(canvas, size, paint, const Color(0xFF001D3D), 25, [
-      Offset(0, size.height * 0.2),
-      Offset(size.width * 0.4, size.height * 0.45),
-      Offset(size.width * 0.8, size.height * 0.25),
-      Offset(size.width, size.height * 0.35),
+    // CAPA 1: Abismo (Azul Casi Negro)
+    _drawErraticPath(canvas, size, paint, const Color(0xFF001021), 25, [
+      Offset(0, size.height * 0.15),
+      Offset(size.width * 0.25, size.height * 0.35),
+      Offset(size.width * 0.6, size.height * 0.1),
+      Offset(size.width, size.height * 0.3),
     ]);
 
-    _drawPathLayer(canvas, size, paint, const Color(0xFF003566), 25, [
+    // CAPA 2: Marino Profundo
+    _drawErraticPath(canvas, size, paint, const Color(0xFF001E3C), 25, [
       Offset(0, size.height * 0.4),
-      Offset(size.width * 0.3, size.height * 0.3),
-      Offset(size.width * 0.7, size.height * 0.55),
-      Offset(size.width, size.height * 0.45),
+      Offset(size.width * 0.35, size.height * 0.2),
+      Offset(size.width * 0.7, size.height * 0.5),
+      Offset(size.width, size.height * 0.4),
     ]);
 
-    _drawPathLayer(canvas, size, paint, const Color(0xFF00509E), 25, [
-      Offset(0, size.height * 0.55),
-      Offset(size.width * 0.5, size.height * 0.7),
-      Offset(size.width * 0.9, size.height * 0.5),
-      Offset(size.width, size.height * 0.6),
+    // CAPA 3: Cobalto Real
+    _drawErraticPath(canvas, size, paint, const Color(0xFF003870), 25, [
+      Offset(0, size.height * 0.6),
+      Offset(size.width * 0.5, size.height * 0.75),
+      Offset(size.width * 0.85, size.height * 0.55),
+      Offset(size.width, size.height * 0.65),
     ]);
 
-    _drawPathLayer(canvas, size, paint, const Color(0xFF0077B6), 25, [
-      Offset(0, size.height * 0.7),
-      Offset(size.width * 0.4, size.height * 0.6),
-      Offset(size.width * 0.8, size.height * 0.85),
-      Offset(size.width, size.height * 0.75),
+    // CAPA 4: Azul Eléctrico
+    _drawErraticPath(canvas, size, paint, const Color(0xFF0059B3), 25, [
+      Offset(0, size.height * 0.75),
+      Offset(size.width * 0.3, size.height * 0.65),
+      Offset(size.width * 0.65, size.height * 0.85),
+      Offset(size.width, size.height * 0.7),
     ]);
 
-    _drawPathLayer(canvas, size, paint, const Color(0xFF00B4D8), 25, [
-      Offset(0, size.height * 0.85),
-      Offset(size.width * 0.2, size.height * 0.95),
-      Offset(size.width * 0.6, size.height * 0.8),
-      Offset(size.width, size.height * 0.9),
+    // CAPA 5: Acero Neón (Cima)
+    _drawErraticPath(canvas, size, paint, const Color(0xFF0080FF), 25, [
+      Offset(0, size.height * 0.9),
+      Offset(size.width * 0.4, size.height * 0.95),
+      Offset(size.width * 0.75, size.height * 0.85),
+      Offset(size.width, size.height * 0.95),
     ]);
   }
 
-  void _drawPathLayer(Canvas canvas, Size size, Paint paint, Color color, double depth, List<Offset> pts) {
+  void _drawErraticPath(Canvas canvas, Size size, Paint paint, Color color, double depth, List<Offset> pts) {
     paint.color = color;
     final path = Path();
     path.moveTo(pts[0].dx, pts[0].dy);
-    path.cubicTo(pts[1].dx, pts[1].dy, pts[2].dx, pts[2].dy, pts[3].dx, pts[3].dy);
+    
+    // Curvas Bezier de tercer grado para formas mucho más orgánicas
+    path.cubicTo(
+      pts[1].dx, pts[1].dy,
+      pts[2].dx, pts[2].dy,
+      pts[3].dx, pts[3].dy,
+    );
+    
     path.lineTo(size.width, size.height);
     path.lineTo(0, size.height);
     path.close();
 
-    // Sombra de Papel Real
     canvas.drawShadow(path, Colors.black, depth, true);
     canvas.drawPath(path, paint);
   }
@@ -106,7 +116,7 @@ class PremiumGlassCard extends StatelessWidget {
   const PremiumGlassCard({
     super.key,
     required this.child,
-    this.borderRadius = 24.0,
+    this.borderRadius = 28.0,
     this.blur = 15.0,
   });
 
@@ -118,11 +128,11 @@ class PremiumGlassCard extends StatelessWidget {
         filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.1), // Opacidad solicitada del 0.1
+            color: Colors.white.withOpacity(0.1),
             borderRadius: BorderRadius.circular(borderRadius),
             border: Border.all(
-              color: Colors.white.withOpacity(0.12),
-              width: 0.8,
+              color: Colors.white.withOpacity(0.08),
+              width: 0.5,
             ),
           ),
           child: child,
@@ -162,7 +172,7 @@ class VolumetricIcon extends StatelessWidget {
         errorBuilder: (context, error, stackTrace) => Icon(
           Icons.wb_cloudy_rounded,
           size: size * 0.5,
-          color: Colors.white.withOpacity(0.7),
+          color: Colors.white.withOpacity(0.6),
         ),
       ),
     );

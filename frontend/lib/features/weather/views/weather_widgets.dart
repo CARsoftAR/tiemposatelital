@@ -6,6 +6,7 @@ import 'package:lottie/lottie.dart';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lottie/lottie.dart';
 
 class DynamicWeatherBackground extends StatelessWidget {
   final int? weatherCode;
@@ -20,26 +21,16 @@ class DynamicWeatherBackground extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFF001529),
       body: Stack(
         children: [
-          // Fondo Profundo (Identidad Flowy)
-          Positioned.fill(
-            child: Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [Color(0xFF001529), Color(0xFF003366)], 
-                ),
-              ),
-            ),
-          ),
+          // Fondo de Referencia (5 Capas Orgánicas)
           Positioned.fill(
             child: CustomPaint(
-              painter: TopographicPainter(),
+              painter: DeepTopographicPainter(),
             ),
           ),
-          // Contenido principal con Glassmorphism
+          // Contenido principal
           SafeArea(child: child),
         ],
       ),
@@ -47,38 +38,49 @@ class DynamicWeatherBackground extends StatelessWidget {
   }
 }
 
-class TopographicPainter extends CustomPainter {
+class DeepTopographicPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()..style = PaintingStyle.fill;
 
-    // Capas Orgánicas con Sombras Profundas
-    paint.color = const Color(0xFF002D5A).withOpacity(0.6);
-    _drawLayer(canvas, size, 0.35, 0.55, paint);
+    // Capa 1: Azul Profundo Base
+    paint.color = const Color(0xFF001A33);
+    _drawLayer(canvas, size, 0.25, 0.45, paint, 10);
 
-    paint.color = const Color(0xFF004080).withOpacity(0.5);
-    _drawLayer(canvas, size, 0.45, 0.65, paint);
+    // Capa 2: Azul Cobalto
+    paint.color = const Color(0xFF003366);
+    _drawLayer(canvas, size, 0.35, 0.55, paint, 15);
 
-    paint.color = const Color(0xFF0059B3).withOpacity(0.4);
-    _drawLayer(canvas, size, 0.55, 0.75, paint);
+    // Capa 3: Azul Eléctrico Vibrante
+    paint.color = const Color(0xFF004080);
+    _drawLayer(canvas, size, 0.45, 0.65, paint, 20);
+
+    // Capa 4: Azul Cielo Oscuro
+    paint.color = const Color(0xFF0059B3);
+    _drawLayer(canvas, size, 0.55, 0.75, paint, 25);
+
+    // Capa 5: Azul Acero (Más cercana)
+    paint.color = const Color(0xFF0073E6);
+    _drawLayer(canvas, size, 0.65, 0.85, paint, 30);
   }
 
-  void _drawLayer(Canvas canvas, Size size, double y1, double y2, Paint paint) {
+  void _drawLayer(Canvas canvas, Size size, double y1, double y2, Paint paint, double shadowDepth) {
     final path = Path();
     path.moveTo(0, size.height * y1);
     path.quadraticBezierTo(
-      size.width * 0.45, size.height * (y1 - 0.12),
-      size.width * 0.75, size.height * y2,
+      size.width * 0.3, size.height * (y1 - 0.15),
+      size.width * 0.6, size.height * y2,
     );
     path.quadraticBezierTo(
-      size.width * 0.95, size.height * (y2 + 0.08),
-      size.width, size.height * (y1 + 0.02),
+      size.width * 0.85, size.height * (y2 + 0.12),
+      size.width, size.height * (y1 + 0.05),
     );
     path.lineTo(size.width, size.height);
     path.lineTo(0, size.height);
     path.close();
 
-    canvas.drawShadow(path, Colors.black.withOpacity(0.8), 20, true);
+    // Sombra Proyectada Profunda (Estilo Paper-cut)
+    canvas.drawShadow(path, Colors.black, shadowDepth, true);
     canvas.drawPath(path, paint);
   }
 
@@ -86,71 +88,74 @@ class TopographicPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-class GlassCard extends StatelessWidget {
+class PaperCard extends StatelessWidget {
   final Widget child;
   final double borderRadius;
-  final double blur;
+  final Color color;
 
-  const GlassCard({
+  const PaperCard({
     super.key,
     required this.child,
     this.borderRadius = 24.0,
-    this.blur = 20.0,
+    this.color = const Color(0xFF003366),
   });
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(borderRadius),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.06),
-            borderRadius: BorderRadius.circular(borderRadius),
-            border: Border.all(
-              color: Colors.white.withOpacity(0.1), // Hilo blanco casi invisible
-              width: 0.5,
-            ),
+    return Container(
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.9), // Opaca
+        borderRadius: BorderRadius.circular(borderRadius),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.4),
+            blurRadius: 15,
+            spreadRadius: 2,
+            offset: const Offset(0, 8),
           ),
-          child: child,
-        ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(borderRadius),
+        child: child,
       ),
     );
   }
 }
 
-class WeatherIcon extends StatelessWidget {
+class VolumetricIcon extends StatelessWidget {
   final int weatherCode;
   final double size;
-  final Color color;
 
-  const WeatherIcon({
+  const VolumetricIcon({
     super.key,
     required this.weatherCode,
-    this.size = 24.0,
-    this.color = Colors.white,
+    this.size = 140,
   });
 
   @override
   Widget build(BuildContext context) {
-    IconData iconData;
-    if (weatherCode == 0) {
-      iconData = Icons.wb_sunny_rounded;
-    } else if (weatherCode <= 3) {
-      iconData = Icons.wb_cloudy_rounded;
-    } else if (weatherCode <= 48) {
-      iconData = Icons.filter_drama_rounded;
-    } else if (weatherCode <= 67) {
-      iconData = Icons.umbrella_rounded;
-    } else {
-      iconData = Icons.flash_on_rounded;
+    // Usamos Lottie con relieve si es posible, o una representación robusta
+    String url = 'https://lottie.host/8cd7b26c-d64e-4f0e-8f2e-4b77f9f234b4/T98653dTeD.json'; // Sun 3D style
+    
+    if (weatherCode > 0 && weatherCode <= 3) {
+      url = 'https://lottie.host/c9d92e59-c290-410e-88f5-7d5a5a1f6a1e/X3N9sE6n7q.json'; // Cloud 3D
+    } else if (weatherCode > 3) {
+      url = 'https://lottie.host/2e707e7b-f1de-448f-8973-10e3d937b83d/vOQ7Y6Yv8Z.json'; // Rain 3D
     }
 
-    return Icon(
-      iconData,
-      size: size,
-      color: color,
+    return SizedBox(
+      width: size,
+      height: size,
+      child: Lottie.network(
+        url,
+        fit: BoxFit.contain,
+        errorBuilder: (context, error, stackTrace) => Icon(
+          Icons.wb_cloudy_rounded,
+          size: size * 0.6,
+          color: Colors.white,
+        ),
+      ),
     );
   }
 }

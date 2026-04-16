@@ -1,0 +1,12 @@
+build_outputs/
+backend/*/db.sqlite3
+backend/*/static/
+backend/*/media/
+frontend/build/
+frontend/.dart_tool/
+frontend/.packages
+frontend/.flutter-plugins
+frontend/.flutter-plugins-dependencies
+.DS_Store
+*.apk
+*.exe
